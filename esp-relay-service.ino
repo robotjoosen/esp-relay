@@ -12,9 +12,9 @@
 ESP8266WiFiMulti WiFiMulti;
 ESP8266WebServer server(80);
 
-const char* SSID = "";
-const char* PASSWORD = "";
-const String device_name = "ESP8266-Relay-02";
+const char* SSID = "your-ssid";
+const char* PASSWORD = "your-password";
+const String device_name = "ESP8266-Relay";
 
 void handleRoot() {
     int d = 10;
@@ -106,4 +106,19 @@ void setup() {
 
 void loop() {
     server.handleClient();
+}
+
+// sound pattern
+// [state, duration]
+int pattern[][2] = {
+    [1,20],
+    [0,100],
+    [1,20],
+    [0,100],
+    [1,50],
+    [0,20],
+    [1,20],
+    [0,20],
+    [1,20],
+    [0,20],
 }
