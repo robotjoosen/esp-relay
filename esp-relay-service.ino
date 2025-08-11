@@ -12,12 +12,14 @@
 ESP8266WiFiMulti WiFiMulti;
 ESP8266WebServer server(80);
 
-const char* SSID = "your-ssid";
-const char* PASSWORD = "your-password";
+const char* SSID = "Erwtensoep";
+const char* PASSWORD = "SoepMetWorst!";
 const String device_name = "ESP8266-Relay";
 
 void handleRoot() {
     int d = 10;
+    float amount = 0;
+
     String t;
     for ( uint8_t i = 0; i < server.args(); i++ ) {
 
@@ -33,16 +35,16 @@ void handleRoot() {
         ms.GetMatch(result);
         String normalized = result;
         normalized.replace(",",".");
-
-        if(normalized.toFloat() < 1) {
+        amount = normalized.toFloat();
+        if(amount < 1) {
             //
-        } else if(normalized.toFloat() < 5) {
+        } else if(amount < 5) {
             d = 50;
-        } else if(normalized.toFloat() < 10) {
+        } else if(amount < 10) {
             d = 100;
-        } else if(normalized.toFloat() < 20) {
+        } else if(amount < 20) {
             d = 250;
-        } else if(normalized.toFloat() < 50) {
+        } else if(amount < 50) {
             d = 500;
         } else {
             d = 1500;
@@ -50,13 +52,28 @@ void handleRoot() {
     }
 
     char msg[400];
-    snprintf(msg, 400, "{\"success\" : 1, \"message\" : \"Index\", \"delay\": \"%02d\"}", d);
-
-    digitalWrite(RELAY_PORT, LOW);
+    snprintf(msg, 400, "{\"success\" : 1, \"message\" : \"Index\", \"delay\": \"%02d\", \"amount\": \"%02f\"}", d, amount);
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/plain", msg);
-    delay(d);
-    digitalWrite(RELAY_PORT, HIGH);
+
+    switch(int(amount * 100)) {
+        case 911:
+            Serial.println("911 triggered");
+            digitalWrite(RELAY_PORT, LOW);
+            delay(500);
+            digitalWrite(RELAY_PORT, HIGH);
+            delay(2000);
+            digitalWrite(RELAY_PORT, LOW);
+            delay(500);
+            digitalWrite(RELAY_PORT, HIGH);
+            break;
+        default:
+            Serial.println("Delay trigger warning!!!");
+            digitalWrite(RELAY_PORT, LOW);
+            delay(d);
+            digitalWrite(RELAY_PORT, HIGH);
+    }
+    
 }
 
 void handleNotFound() {
@@ -106,19 +123,4 @@ void setup() {
 
 void loop() {
     server.handleClient();
-}
-
-// sound pattern
-// [state, duration]
-int pattern[][2] = {
-    [1,20],
-    [0,100],
-    [1,20],
-    [0,100],
-    [1,50],
-    [0,20],
-    [1,20],
-    [0,20],
-    [1,20],
-    [0,20],
 }
