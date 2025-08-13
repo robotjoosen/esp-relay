@@ -12,8 +12,8 @@
 ESP8266WiFiMulti WiFiMulti;
 ESP8266WebServer server(80);
 
-const char* SSID = "Erwtensoep";
-const char* PASSWORD = "SoepMetWorst!";
+const char* SSID = "your-ssid";
+const char* PASSWORD = "your-password";
 const String device_name = "ESP8266-Relay";
 
 void handleRoot() {
@@ -56,22 +56,22 @@ void handleRoot() {
     server.sendHeader("Access-Control-Allow-Origin", "*");
     server.send(200, "text/plain", msg);
 
-    switch(int(amount * 100)) {
-        case 911:
-            Serial.println("911 triggered");
-            digitalWrite(RELAY_PORT, LOW);
-            delay(500);
-            digitalWrite(RELAY_PORT, HIGH);
-            delay(2000);
-            digitalWrite(RELAY_PORT, LOW);
-            delay(500);
-            digitalWrite(RELAY_PORT, HIGH);
-            break;
-        default:
-            Serial.println("Delay trigger warning!!!");
-            digitalWrite(RELAY_PORT, LOW);
-            delay(d);
-            digitalWrite(RELAY_PORT, HIGH);
+
+    if (amount > 9.101 && amount < 9.111) {
+        Serial.println("911 triggered");
+        digitalWrite(RELAY_PORT, LOW);
+        delay(500);
+        digitalWrite(RELAY_PORT, HIGH);
+        delay(2000);
+        digitalWrite(RELAY_PORT, LOW);
+        delay(500);
+        digitalWrite(RELAY_PORT, HIGH);
+
+    } else {
+        Serial.println("Delay trigger warning!!!");
+        digitalWrite(RELAY_PORT, LOW);
+        delay(d);
+        digitalWrite(RELAY_PORT, HIGH);
     }
     
 }
